@@ -18,13 +18,13 @@ using namespace std;
 struct Studentas{
     string vardas;
     string pav;
-    vector<int> paz;
+    vector<int> namu_darbu_balas;
     int egzas;
     float rez_avg;
     float rez_median;
     };
 
-Studentas ivesk(string tipas);
+Studentas rankinis_ivedimas(string tipas);
 double median_calculation(vector<int> value);
 
 int main(){
@@ -33,18 +33,23 @@ int main(){
     string rezultato_tipas;
 
     //pati pati pradzia
+    cout << " --- STUDENTU REZULTATU SISTEMA --- " << endl;
     cout << "Kiek studentu noresite ivesti? "<< endl;
-    cin >> studentu_kiekis;
+    cin >> studentu_kiekis; 
 
-    cout<<"Iveskite, kokiu formatu norite, kad pateikciau rezultata:"<<endl;
+    cout<<"Iveskite, kokiu formatu norite, kad butu pateikti rezultatai:"<<endl;
     cout<<"Jei vidurkis: vidurkis"<<endl;
     cout<<"Jei mediana: mediana"<<endl;
     cout<<"Jei vidurki ir mediana: abu"<<endl;
-    cin >> rezultato_tipas;
+
+    //uztikrinama, kad kol nebus ivestas teisingas variantas, tol prasysim vesti
+    do {
+    cin >> rezultato_tipas; 
+    } while(rezultato_tipas != "vidurkis" && rezultato_tipas != "mediana" && rezultato_tipas != "abu");
 
     for(int j=0; j<studentu_kiekis; j++){
-        cout<<"Iveskite "<<j+1<< "studenta\n";
-        Grupe.push_back(ivesk(rezultato_tipas));
+        cout<<"Iveskite "<<j+1<< " studenta\n";
+        Grupe.push_back(rankinis_ivedimas(rezultato_tipas));
     }
 
     //lenteles atvaizdavimas
@@ -69,27 +74,38 @@ int main(){
 
 }
 
-Studentas ivesk(string tipas){
+Studentas rankinis_ivedimas(string tipas){
     Studentas Laik;
-    int sum=0, n,m;
+    int sum=0;
+    string m;
         
     cout<<"Ivesk varda: "; cin>> Laik.vardas;
     cout<<"Ivesk pavarde: "; cin>> Laik.pav;
-    cout<<"Kiek namu darbu pazymiu norite ivesti?"; cin >>n;
 
-    for (int i=0;i<n;i++){
-        cout<<"Iveskite "<< i+1 <<"-ji namu darbu paz. is "<<n<< " : "; cin>>m;
-        Laik.paz.push_back(m);
-        sum+=m;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); //ignoruoja paskutini 
+
+    bool flag = true;
+    while(flag){
+        cout<<"iveskite namu darbu pazymi (arba ENTER, kad pabaigti): "<< endl;
+        getline(cin, m);
+        if(m.empty()){
+          cout << "namu darbu vedimas baigesi"<< endl;
+          flag = false;
         }
+        else{
+            int grade = stoi(m); //stoi konvertuoja duomenu tipa is string i int
+            Laik.namu_darbu_balas.push_back(grade);
+            sum += grade; 
+        }
+    }
 
     cout<<"Ivesk egzamino rezultata: "; cin>> Laik.egzas;
     
     if(tipas=="vidurkis" || tipas=="abu"){  
-        Laik.rez_avg= Laik.egzas*0.6 + double(sum)/double(Laik.paz.size()) *0.4;
+        Laik.rez_avg= Laik.egzas*0.6 + double(sum)/double(Laik.namu_darbu_balas.size()) *0.4;
     }
     if(tipas=="mediana" || tipas=="abu"){
-        Laik.rez_median= Laik.egzas*0.6 + median_calculation(Laik.paz) *0.4;
+        Laik.rez_median= Laik.egzas*0.6 + median_calculation(Laik.namu_darbu_balas) *0.4;
     }
     return Laik;
 }
