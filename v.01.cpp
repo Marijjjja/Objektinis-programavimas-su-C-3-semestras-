@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <random>
 
 using std::cout;
 using std::cin;
@@ -25,31 +26,48 @@ struct Studentas{
     };
 
 Studentas rankinis_ivedimas(string tipas);
+Studentas atisitiktiniai_skaiciai(string tipas);
 double median_calculation(vector<int> value);
 
 int main(){
     vector<Studentas> Grupe;
     int studentu_kiekis;
     string rezultato_tipas;
+    int rezimas;
 
     //pati pati pradzia
     cout << " --- STUDENTU REZULTATU SISTEMA --- " << endl;
+    cout << " " << endl;
+    cout << "Pasirinkite rezima: " << endl;
+    cout<<"1:   viska suvesti rankiniu budu"<<endl;
+    cout<<"2:   vardas ir pavarde - rankiniu budu; pazymiai - atsitiktiniai"<<endl;
+
+    do {
+    cin >> rezimas; 
+    } while(rezimas != 1 && rezimas != 2);
+
     cout << "Kiek studentu noresite ivesti? "<< endl;
     cin >> studentu_kiekis; 
 
     cout<<"Iveskite, kokiu formatu norite, kad butu pateikti rezultatai:"<<endl;
-    cout<<"Jei vidurkis: vidurkis"<<endl;
-    cout<<"Jei mediana: mediana"<<endl;
-    cout<<"Jei vidurki ir mediana: abu"<<endl;
+    cout<<"vidurkis:  rezultatu vidurkis"<<endl;
+    cout<<"mediana :  rezultatu mediana"<<endl;
+    cout<<"abu     :  rezultatu vidurkis ir mediana"<<endl;
 
     //uztikrinama, kad kol nebus ivestas teisingas variantas, tol prasysim vesti
     do {
     cin >> rezultato_tipas; 
     } while(rezultato_tipas != "vidurkis" && rezultato_tipas != "mediana" && rezultato_tipas != "abu");
 
+    //rezimo executionas
     for(int j=0; j<studentu_kiekis; j++){
-        cout<<"Iveskite "<<j+1<< " studenta\n";
+        cout<<"Iveskite studenta: "<<j+1<<"/"<<studentu_kiekis<<endl;
+        if(rezimas==1){
         Grupe.push_back(rankinis_ivedimas(rezultato_tipas));
+        }
+        else{
+        Grupe.push_back(atisitiktiniai_skaiciai(rezultato_tipas));
+        }
     }
 
     //lenteles atvaizdavimas
@@ -71,7 +89,6 @@ int main(){
         for(auto temp: Grupe)
             cout<<" "<<temp.vardas<<"        "<<temp.pav<<"         "<<fixed<< setprecision(2)<<temp.rez_avg<<"/"<<fixed<< setprecision(2)<<temp.rez_median<<endl;
     }
-
 }
 
 Studentas rankinis_ivedimas(string tipas){
@@ -89,6 +106,7 @@ Studentas rankinis_ivedimas(string tipas){
         cout<<"iveskite namu darbu pazymi (arba ENTER, kad pabaigti): "<< endl;
         getline(cin, m);
         if(m.empty()){
+          cout << endl
           cout << "namu darbu vedimas baigesi"<< endl;
           flag = false;
         }
@@ -102,13 +120,60 @@ Studentas rankinis_ivedimas(string tipas){
     cout<<"Ivesk egzamino rezultata: "; cin>> Laik.egzas;
     
     if(tipas=="vidurkis" || tipas=="abu"){  
-        Laik.rez_avg= Laik.egzas*0.6 + double(sum)/double(Laik.namu_darbu_balas.size()) *0.4;
+        if(Laik.namu_darbu_balas.size()!=0){  
+            Laik.rez_avg= Laik.egzas*0.6 + double(sum)/double(Laik.namu_darbu_balas.size()) *0.4;
+        } else {
+            cout << "Nebuvo ivesta namu darbu!" << endl;
+        }
     }
     if(tipas=="mediana" || tipas=="abu"){
         Laik.rez_median= Laik.egzas*0.6 + median_calculation(Laik.namu_darbu_balas) *0.4;
     }
     return Laik;
 }
+
+Studentas atisitiktiniai_skaiciai(string tipas){
+    Studentas Laik;
+    int namu_darbu_kiekis;
+    int sum=0;
+    int grade;
+    string m;
+        
+    cout<<"Ivesk varda: "; cin>> Laik.vardas;
+    cout<<"Ivesk pavarde: "; cin>> Laik.pav;
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); //ignoruoja paskutini 
+
+    cout << "Kiek norite, kad mokinys turetu namu darbu pazymiu?"<< endl;
+    cin >> namu_darbu_kiekis;
+
+    //atsitiktinio skaiciau generavimas
+    random_device rd;  
+    mt19937 gen(rd()); 
+    uniform_int_distribution<> dist(1, 10);
+
+    for(int i=0; i<namu_darbu_kiekis; i++){
+        grade = dist(gen);
+        Laik.namu_darbu_balas.push_back(grade);
+        sum += grade;
+    }
+
+    Laik.egzas = dist(gen);
+
+    if(tipas=="vidurkis" || tipas=="abu"){  
+        if(!Laik.namu_darbu_balas.empty()){  
+            Laik.rez_avg= Laik.egzas*0.6 + double(sum)/double(Laik.namu_darbu_balas.size()) *0.4;
+        }else{
+            cout << "Nebuvo ivesta namu darbu!" << endl;
+        }
+    }
+
+    if(tipas=="mediana" || tipas=="abu"){
+        Laik.rez_median= Laik.egzas*0.6 + median_calculation(Laik.namu_darbu_balas) *0.4;
+    }
+    return Laik; 
+}
+
 
 double median_calculation(vector<int> value){
     sort(value.begin(), value.end());
