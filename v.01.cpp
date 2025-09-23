@@ -30,7 +30,7 @@ struct Studentas{
 Studentas rankinis_ivedimas(string tipas);
 Studentas atisitiktiniai_skaiciai(string tipas);
 double median_calculation(vector<int> value);
-void file_nuskaitymas(string path);
+Studentas file_nuskaitymas(string path);
 
 int main(){
     vector<Studentas> Grupe;
@@ -54,17 +54,6 @@ int main(){
     } while(rezimas != 1 && rezimas != 2 && rezimas != 3);
 
     cout << " " << endl;
-    if(rezimas == 1 || rezimas == 2){
-        cout << "Kiek studentu noresite ivesti? "<< endl;
-        cin >> studentu_kiekis; 
-    } else {
-        cout << "Pateikite filo, kuri norite nuskaityti path."<< endl;
-        cin >> path;
-        file_nuskaitymas(path);
-    }
-    
-
-    cout << " " << endl;
     cout<<"Iveskite, kokiu formatu norite, kad butu pateikti rezultatai:"<<endl;
     cout<<"vidurkis:  rezultatu vidurkis"<<endl;
     cout<<"mediana :  rezultatu mediana"<<endl;
@@ -75,14 +64,26 @@ int main(){
     cin >> rezultato_tipas; 
     } while(rezultato_tipas != "vidurkis" && rezultato_tipas != "mediana" && rezultato_tipas != "abu");
 
+    cout << " " << endl;
+    if(rezimas == 1 || rezimas == 2){
+        cout << "Kiek studentu noresite ivesti? "<< endl;
+        cin >> studentu_kiekis; 
+    } else {
+        cout << "Pateikite filo, kuri norite nuskaityti path."<< endl;
+        cin >> path;
+    }
+
     //rezimo executionas
     for(int j=0; j<studentu_kiekis; j++){
         cout<<"Iveskite studenta: "<<j+1<<"/"<<studentu_kiekis<<endl;
         if(rezimas==1){
-        Grupe.push_back(rankinis_ivedimas(rezultato_tipas));
+            Grupe.push_back(rankinis_ivedimas(rezultato_tipas));
+        }
+        else if(rezimas == 2){
+            Grupe.push_back(atisitiktiniai_skaiciai(rezultato_tipas));
         }
         else{
-        Grupe.push_back(atisitiktiniai_skaiciai(rezultato_tipas));
+            Grupe.push_back(file_nuskaitymas(path));
         }
     }
 
@@ -200,7 +201,8 @@ double median_calculation(vector<int> value){
         return (value[n/2 - 1] + value[n/2]) / 2.0;
 }
 
-void file_nuskaitymas(string path){
+Studentas file_nuskaitymas(string path){
+    Studentas Laik;
     ifstream inFile;
     string line;
     vector<string> header;
