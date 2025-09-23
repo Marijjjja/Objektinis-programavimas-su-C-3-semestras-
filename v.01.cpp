@@ -217,15 +217,17 @@ Studentas file_nuskaitymas(string path){
     // while (getline(inFile, line)) {   // read line by line
     //     cout << line << endl;          // print each line
     // }
+
+    // sutvarkome pirmaja eilute, kuri nurodo kur kokia reiksme yra:
     string headerLine;
     getline(inFile, headerLine);
-    // cout << headerLine<< endl;
 
     stringstream ss(headerLine);
 
     while (getline(ss, token, ',')) {
     header.push_back(token);
     }
+    for (auto &h : header) cout << h << endl;
 
     inFile.close();
     // return 0;
