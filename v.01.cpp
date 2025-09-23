@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <fstream>
+#include <sstream>
 
 using std::cout;
 using std::cin;
@@ -28,27 +30,41 @@ struct Studentas{
 Studentas rankinis_ivedimas(string tipas);
 Studentas atisitiktiniai_skaiciai(string tipas);
 double median_calculation(vector<int> value);
+void file_nuskaitymas(string path);
 
 int main(){
     vector<Studentas> Grupe;
     int studentu_kiekis;
     string rezultato_tipas;
     int rezimas;
+    string path;
 
     //pati pati pradzia
+    cout << " " << endl;
     cout << " --- STUDENTU REZULTATU SISTEMA --- " << endl;
     cout << " " << endl;
+
     cout << "Pasirinkite rezima: " << endl;
     cout<<"1:   viska suvesti rankiniu budu"<<endl;
     cout<<"2:   vardas ir pavarde - rankiniu budu; pazymiai - atsitiktiniai"<<endl;
-
+    cout<<"3:   nuskaityti duomenis is file'o"<< endl;
+    
     do {
     cin >> rezimas; 
-    } while(rezimas != 1 && rezimas != 2);
+    } while(rezimas != 1 && rezimas != 2 && rezimas != 3);
 
-    cout << "Kiek studentu noresite ivesti? "<< endl;
-    cin >> studentu_kiekis; 
+    cout << " " << endl;
+    if(rezimas == 1 || rezimas == 2){
+        cout << "Kiek studentu noresite ivesti? "<< endl;
+        cin >> studentu_kiekis; 
+    } else {
+        cout << "Pateikite filo, kuri norite nuskaityti path."<< endl;
+        cin >> path;
+        file_nuskaitymas(path);
+    }
+    
 
+    cout << " " << endl;
     cout<<"Iveskite, kokiu formatu norite, kad butu pateikti rezultatai:"<<endl;
     cout<<"vidurkis:  rezultatu vidurkis"<<endl;
     cout<<"mediana :  rezultatu mediana"<<endl;
@@ -106,7 +122,7 @@ Studentas rankinis_ivedimas(string tipas){
         cout<<"iveskite namu darbu pazymi (arba ENTER, kad pabaigti): "<< endl;
         getline(cin, m);
         if(m.empty()){
-          cout << endl
+          cout << endl;
           cout << "namu darbu vedimas baigesi"<< endl;
           flag = false;
         }
@@ -182,4 +198,34 @@ double median_calculation(vector<int> value){
         return value[n/2];
     else
         return (value[n/2 - 1] + value[n/2]) / 2.0;
+}
+
+void file_nuskaitymas(string path){
+    ifstream inFile;
+    string line;
+    vector<string> header;
+    string token;
+
+    inFile.open(path);
+    if (!inFile) {
+        cout << "Nepavyko atidaryti file'o -- ivyko klaida.";
+        exit(1); // uzbaigia kodo veikima su klaida jei kazkas negerai
+    }
+
+    // while (getline(inFile, line)) {   // read line by line
+    //     cout << line << endl;          // print each line
+    // }
+    string headerLine;
+    getline(inFile, headerLine);
+    // cout << headerLine<< endl;
+
+    stringstream ss(headerLine);
+
+    while (getline(ss, token, ',')) {
+    header.push_back(token);
+    }
+
+    inFile.close();
+    // return 0;
+
 }
