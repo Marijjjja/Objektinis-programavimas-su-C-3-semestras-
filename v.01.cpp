@@ -1,4 +1,3 @@
-//bibliotekos
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -23,7 +22,7 @@ Studentas atisitiktiniai_skaiciai(string tipas);
 double median_calculation(vector<int> value);
 void file_nuskaitymas(string path, string rezultato_tipas);
 void sorting_values(vector<Studentas>& klasiu_vektorius);
-bool comparison(const Studentas& a, const Studentas& b);
+bool comparison(Studentas &a, Studentas &b);
 
 int main(){
     vector<Studentas> Grupe;
@@ -52,7 +51,7 @@ int main(){
         }
     }
 
-    cout << " " << endl;
+    cout << endl;
     cout<<"Iveskite, kokiu formatu norite, kad butu pateikti rezultatai:"<<endl;
     cout<<"vidurkis:  rezultatu vidurkis"<<endl;
     cout<<"mediana :  rezultatu mediana"<<endl;
@@ -63,7 +62,7 @@ int main(){
     cin >> rezultato_tipas; 
     } while(rezultato_tipas != "vidurkis" && rezultato_tipas != "mediana" && rezultato_tipas != "abu");
 
-    cout << " " << endl;
+    cout << endl;
     if(rezimas == 1 || rezimas == 2){
         cout << "Kiek studentu noresite ivesti? "<< endl;
         cin >> studentu_kiekis; 
@@ -118,26 +117,17 @@ Studentas rankinis_ivedimas(string tipas){
     Studentas Laik;
     int sum=0;
     string m;
+    int grade;
         
     cout<<"Ivesk varda: "; cin>> Laik.vardas;
     cout<<"Ivesk pavarde: "; cin>> Laik.pav;
 
-    cin.ignore(numeric_limits<streamsize>::max(), '\n'); //ignoruoja paskutini inputa
 
-    bool flag = true;
-    while(flag){
-        cout<<"iveskite namu darbu pazymi (arba ENTER, kad pabaigti): "<< endl;
-        getline(cin, m);
-        if(m.empty()){
-          cout << endl;
-          cout << "namu darbu vedimas baigesi"<< endl;
-          flag = false;
-        }
-        else{
-            int grade = stoi(m); //stoi konvertuoja duomenu tipa is string i int
-            Laik.namu_darbu_balas.push_back(grade);
-            sum += grade; 
-        }
+    cout << "iveskite namu darbu pazymi (iveskite -1, kad pabaigti): " << endl;
+    while (cin >> grade) {
+        if (grade == -1) break;        // stop condition
+        Laik.namu_darbu_balas.push_back(grade);
+        sum += grade;
     }
 
     cout<<"Ivesk egzamino rezultata: "; 
@@ -155,7 +145,6 @@ Studentas rankinis_ivedimas(string tipas){
     }
     return Laik;
 }
-
 
 Studentas atisitiktiniai_skaiciai(string tipas){
     Studentas Laik;
@@ -257,17 +246,15 @@ void file_nuskaitymas(string path, string rezultato_tipas){
 
         for (int idx: homeworkIdx) {
             string s = tokens[idx];
-            s.erase(0, s.find_first_not_of(" \t\r\n"));
-            s.erase(s.find_last_not_of(" \t\r\n") + 1);
             if (!s.empty())
                 Laik.namu_darbu_balas.push_back(stoi(s));
             else
-                Laik.namu_darbu_balas.push_back(0); // default if empty
+                Laik.namu_darbu_balas.push_back(0);
         }
 
         Laik.egzas = stoi(tokens[examIdx]);
         
-        for (int grade : Laik.namu_darbu_balas) {
+        for (int grade: Laik.namu_darbu_balas) {
             sum += grade;
         }
 
@@ -285,8 +272,8 @@ void file_nuskaitymas(string path, string rezultato_tipas){
         students.push_back(Laik);
         lineNum += 1;
     }
-
     inFile.close();
+
     sorting_values(students);
 
     output_file.open("rezultatas.txt", ios::out);
@@ -325,10 +312,9 @@ void sorting_values(vector<Studentas>& klasiu_vektorius){
     sort(klasiu_vektorius.begin(), klasiu_vektorius.end(), comparison);
 }
 
-bool comparison(const Studentas& a, const Studentas& b) {
+bool comparison(Studentas &a, Studentas &b) {
     return a.vardas < b.vardas;
 }
-
 double median_calculation(vector<int> value){
     sort(value.begin(), value.end());
     int n = value.size();
