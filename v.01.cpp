@@ -7,15 +7,6 @@
 #include <fstream>
 #include <sstream>
 
-// using std::cout;
-// using std::cin;
-// using std::endl;
-// using std::string;
-// using std::vector;
-// using std::setw;
-// using std::left;
-// using std::right;
-
 using namespace std;
 
 struct Studentas{
@@ -31,7 +22,7 @@ Studentas rankinis_ivedimas(string tipas);
 Studentas atisitiktiniai_skaiciai(string tipas);
 double median_calculation(vector<int> value);
 void file_nuskaitymas(string path, string rezultato_tipas);
-void sorting_values(vector<Studentas> klasiu_vektorius);
+void sorting_values(vector<Studentas>& klasiu_vektorius);
 bool comparison(const Studentas& a, const Studentas& b);
 
 int main(){
@@ -41,7 +32,6 @@ int main(){
     int rezimas;
     string path;
 
-    //pati pati pradzia
     cout << " " << endl;
     cout << " --- STUDENTU REZULTATU SISTEMA --- " << endl;
     cout << " " << endl;
@@ -51,9 +41,16 @@ int main(){
     cout<<"2:   vardas ir pavarde - rankiniu budu; pazymiai - atsitiktiniai"<<endl;
     cout<<"3:   nuskaityti duomenis is file'o"<< endl;
     
-    do {
-    cin >> rezimas; 
-    } while(rezimas != 1 && rezimas != 2 && rezimas != 3);
+    while (true) {
+        if (cin >> rezimas && (rezimas == 1 || rezimas == 2 || rezimas == 3)) {
+            break;
+        }
+        else{ 
+        cout << "Bloga įvestis, iveskite 1, 2 arba 3: "<< endl;
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+    }
 
     cout << " " << endl;
     cout<<"Iveskite, kokiu formatu norite, kad butu pateikti rezultatai:"<<endl;
@@ -85,8 +82,7 @@ int main(){
             cout<<"Iveskite studenta: "<<j+1<<"/"<<studentu_kiekis<<endl;
             Grupe.push_back(atisitiktiniai_skaiciai(rezultato_tipas));
         }
-        }
-
+    }
     if(rezimas == 3){
         file_nuskaitymas(path, rezultato_tipas);
         return 0;
@@ -113,9 +109,9 @@ int main(){
         cout << left << setw(10) << "Vardas" << setw(10) << "Pavarde" << setw(10) << "Rezultatas (vidurkis/mediana)"<<endl;
         cout << endl;
         for(auto i: Grupe) {
-            cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<setw(10)<<i.rez_avg<<"/"<<i.rez_median<< endl;
+            cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<i.rez_avg<<"/"<<i.rez_median<<setw(10)<< endl;
         }
-}
+    }
 }
 
 Studentas rankinis_ivedimas(string tipas){
@@ -126,7 +122,7 @@ Studentas rankinis_ivedimas(string tipas){
     cout<<"Ivesk varda: "; cin>> Laik.vardas;
     cout<<"Ivesk pavarde: "; cin>> Laik.pav;
 
-    cin.ignore(numeric_limits<streamsize>::max(), '\n'); //ignoruoja paskutini 
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); //ignoruoja paskutini inputa
 
     bool flag = true;
     while(flag){
@@ -203,26 +199,18 @@ Studentas atisitiktiniai_skaiciai(string tipas){
     return Laik; 
 }
 
-
-double median_calculation(vector<int> value){
-    sort(value.begin(), value.end());
-    int n = value.size();
-    if(n % 2 == 1)
-        return value[n/2];
-    else
-        return (value[n/2 - 1] + value[n/2]) / 2.0;
-}
-
 void file_nuskaitymas(string path, string rezultato_tipas){
-    Studentas Laik;
     ifstream inFile;
     fstream output_file;
-    string line;
     vector<string> header;
+    string headerLine;
+    string line;
     string token;
-    vector<Studentas> students; //cia laikysiu visus studentus
+    vector<Studentas> students;
     int nameIdx=-1, surnameIdx=-1, examIdx=-1;
     vector<int> homeworkIdx;
+    long lineNum = 0;
+    
 
     //file'o nuskaitymas
     inFile.open(path);
@@ -232,11 +220,10 @@ void file_nuskaitymas(string path, string rezultato_tipas){
     }
 
     // sutvarkome pirmaja eilute, kuri nurodo kur kokia reiksme yra:
-    string headerLine;
     getline(inFile, headerLine);
 
     stringstream ss(headerLine);
-    while (ss >> token) {   // automatically splits by whitespace
+    while (ss >> token) { 
         header.push_back(token);
     }
 
@@ -254,9 +241,14 @@ void file_nuskaitymas(string path, string rezultato_tipas){
         stringstream ss(line);
         string token;
         vector<string> tokens;
+        Studentas Laik;
         double sum=0;
 
-        while (ss >> token) {   // split by any whitespace
+        if (lineNum % 10000 == 0) {
+            cout << "Nuskaitytų eilučių skaičius: "<< lineNum << endl;
+        }
+
+        while (ss >> token) { 
         tokens.push_back(token);
         }
 
@@ -291,16 +283,14 @@ void file_nuskaitymas(string path, string rezultato_tipas){
         }
 
         students.push_back(Laik);
-
-        //tam tikras reiksmes isvalome arba padarome = 0
-        Laik.namu_darbu_balas.clear();
-        sum = 0;
+        lineNum += 1;
     }
 
     inFile.close();
     sorting_values(students);
 
     output_file.open("rezultatas.txt", ios::out);
+
     if (output_file.is_open()){
         if(rezultato_tipas=="vidurkis"){
             output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Rezultatas (vidurkis)"<<endl;
@@ -327,13 +317,23 @@ void file_nuskaitymas(string path, string rezultato_tipas){
         }
 
         output_file.close();
+        cout<<"Rezultatai nuskaityti į rezultatai.txt file'ą!"<< endl;
      }
 }
 
-void sorting_values(vector<Studentas> klasiu_vektorius){
+void sorting_values(vector<Studentas>& klasiu_vektorius){
     sort(klasiu_vektorius.begin(), klasiu_vektorius.end(), comparison);
 }
 
 bool comparison(const Studentas& a, const Studentas& b) {
     return a.vardas < b.vardas;
+}
+
+double median_calculation(vector<int> value){
+    sort(value.begin(), value.end());
+    int n = value.size();
+    if(n % 2 == 1)
+        return value[n/2];
+    else
+        return (value[n/2 - 1] + value[n/2]) / 2.0;
 }
