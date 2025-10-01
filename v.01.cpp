@@ -5,6 +5,7 @@
 #include <random>
 #include <fstream>
 #include <sstream>
+//#include <numeric>
 
 using namespace std;
 
@@ -23,6 +24,7 @@ double median_calculation(vector<int> value);
 void file_nuskaitymas(string path, string rezultato_tipas);
 void sorting_values(vector<Studentas>& klasiu_vektorius);
 bool comparison(Studentas &a, Studentas &b);
+void generated_files(int n);
 
 int main(){
     vector<Studentas> Grupe;
@@ -30,6 +32,7 @@ int main(){
     string rezultato_tipas;
     int rezimas;
     string path;
+    int number;
 
     cout << " " << endl;
     cout << " --- STUDENTU REZULTATU SISTEMA --- " << endl;
@@ -39,16 +42,25 @@ int main(){
     cout<<"1:   viska suvesti rankiniu budu"<<endl;
     cout<<"2:   vardas ir pavarde - rankiniu budu; pazymiai - atsitiktiniai"<<endl;
     cout<<"3:   nuskaityti duomenis is file'o"<< endl;
+    cout<<"4:   sugeneruoti atsitiktinius duomenis"<< endl;
     
     while (true) {
-        if (cin >> rezimas && (rezimas == 1 || rezimas == 2 || rezimas == 3)) {
+        if (cin >> rezimas && (rezimas == 1 || rezimas == 2 || rezimas == 3 || rezimas==4)) {
             break;
         }
         else{ 
-        cout << "Bloga įvestis, iveskite 1, 2 arba 3: "<< endl;
+        cout << "Bloga įvestis, iveskite 1, 2, 3, 4: "<< endl;
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
+    }
+
+    if(rezimas == 4){
+        cout << "Iveskite, kiek eiluciu norite, kad jusu file'e butu"<< endl;
+        cin >> number;
+        generated_files(number);
+        cout << "File'as su "<< number <<" eiluciu buvo sukurtas."<<endl;
+        return 0;
     }
 
     cout << endl;
@@ -66,7 +78,8 @@ int main(){
     if(rezimas == 1 || rezimas == 2){
         cout << "Kiek studentu noresite ivesti? "<< endl;
         cin >> studentu_kiekis; 
-    } else {
+    } 
+    else {
         cout << "Pateikite filo, kuri norite nuskaityti path."<< endl;
         cin >> path;
     }
@@ -308,6 +321,48 @@ void file_nuskaitymas(string path, string rezultato_tipas){
      }
 }
 
+void generated_files(int n){
+    ifstream inFile;
+    fstream output_file;
+    double rezultatas;
+    int grade;
+    double sum;
+    int nd_kiekis;
+    vector<int> skaiciu_vektorius;
+
+    random_device rd;  
+    mt19937 gen(rd()); 
+    uniform_int_distribution<> dist(1, 10);
+    uniform_int_distribution<> dist_0(1, 20);
+
+    nd_kiekis = dist(rd);
+
+    output_file.open("rezultatas_v02.txt", ios::out);
+        output_file << left << setw(18) << "Vardas" 
+                            << setw(18) << "Pavarde";
+        for(int j=0; j<nd_kiekis; j++){
+            output_file << setw(8) << ("ND" + to_string(j+1));
+        }
+        output_file<< setw(18) << "Egzaminas"<<endl;
+        output_file << endl;
+
+    for(int i=0; i<n; i++){
+
+        rezultatas = dist(rd);
+
+        output_file << left << setw(18) << ("Vardas" + to_string(i+1))
+                            << setw(18) << ("Pavarde" + to_string(i+1));
+
+        for(int j=0; j<nd_kiekis; j++){
+            output_file << setw(8) << dist(rd);
+        }
+        output_file<< setw(18) << rezultatas << endl;
+
+        }
+        output_file.close();
+    }
+
+
 void sorting_values(vector<Studentas>& klasiu_vektorius){
     sort(klasiu_vektorius.begin(), klasiu_vektorius.end(), comparison);
 }
@@ -315,6 +370,7 @@ void sorting_values(vector<Studentas>& klasiu_vektorius){
 bool comparison(Studentas &a, Studentas &b) {
     return a.vardas < b.vardas;
 }
+
 double median_calculation(vector<int> value){
     sort(value.begin(), value.end());
     int n = value.size();
