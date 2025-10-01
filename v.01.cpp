@@ -5,7 +5,6 @@
 #include <random>
 #include <fstream>
 #include <sstream>
-//#include <numeric>
 
 using namespace std;
 
@@ -21,10 +20,11 @@ struct Studentas{
 Studentas rankinis_ivedimas(string tipas);
 Studentas atisitiktiniai_skaiciai(string tipas);
 double median_calculation(vector<int> value);
-void file_nuskaitymas(string path, string rezultato_tipas);
+void file_nuskaitymas(string path, string rezultato_tipas, string kategorija);
 void sorting_values(vector<Studentas>& klasiu_vektorius);
 bool comparison(Studentas &a, Studentas &b);
 void generated_files(int n);
+bool studento_kategorija(double galutinis_balas);
 
 int main(){
     vector<Studentas> Grupe;
@@ -33,6 +33,7 @@ int main(){
     int rezimas;
     string path;
     int number;
+    string atsakymas;
 
     cout << " " << endl;
     cout << " --- STUDENTU REZULTATU SISTEMA --- " << endl;
@@ -55,6 +56,9 @@ int main(){
         }
     }
 
+    cout<<"Ar norite, kad rezultatai butu sukategorizuoti? T (taip), N (ne)"<< endl;
+    cin >> atsakymas;
+
     if(rezimas == 4){
         cout << "Iveskite, kiek eiluciu norite, kad jusu file'e butu"<< endl;
         cin >> number;
@@ -69,12 +73,11 @@ int main(){
     cout<<"mediana :  rezultatu mediana"<<endl;
     cout<<"abu     :  rezultatu vidurkis ir mediana"<<endl;
 
-    //uztikrinama, kad kol nebus ivestas teisingas variantas, tol prasysim vesti
     do {
     cin >> rezultato_tipas; 
     } while(rezultato_tipas != "vidurkis" && rezultato_tipas != "mediana" && rezultato_tipas != "abu");
-
     cout << endl;
+
     if(rezimas == 1 || rezimas == 2){
         cout << "Kiek studentu noresite ivesti? "<< endl;
         cin >> studentu_kiekis; 
@@ -96,32 +99,43 @@ int main(){
         }
     }
     if(rezimas == 3){
-        file_nuskaitymas(path, rezultato_tipas);
+        file_nuskaitymas(path, rezultato_tipas, atsakymas);
         return 0;
         }
 
     sorting_values(Grupe);
+    if(atsakymas=="T"){
+        cout << left << setw(10) << "Vardas" << setw(10) << "Pavarde" << setw(10) << "Kategorija"<<endl;
+        cout << endl;
+        for(auto i: Grupe) {
+            if(studento_kategorija(i.rez_avg)){
+                cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<setw(10) << "yay!" << endl;
+            } else {
+                cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<setw(10) << "auch..." << endl;
+            }
+        }
 
-    //lenteles atvaizdavimas
-    if(rezultato_tipas=="vidurkis"){  
-        cout << left << setw(10) << "Vardas" << setw(10) << "Pavarde" << setw(10) << "Rezultatas (vidurkis)"<<endl;
-        cout << endl;
-        for(auto i: Grupe) {
-            cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<setw(10) << i.rez_avg<< endl;
+    } else {
+        if(rezultato_tipas=="vidurkis"){  
+            cout << left << setw(10) << "Vardas" << setw(10) << "Pavarde" << setw(10) << "Rezultatas (vidurkis)"<<endl;
+            cout << endl;
+            for(auto i: Grupe) {
+                cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<setw(10) << i.rez_avg<< endl;
+            }
         }
-    }
-    else if(rezultato_tipas=="mediana"){
-        cout << left << setw(10) << "Vardas" << setw(10) << "Pavarde" << setw(10) << "Rezultatas (mediana)"<<endl;
-        cout << endl;
-        for(auto i: Grupe) {
-            cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<setw(10) << i.rez_median<< endl;
+        else if(rezultato_tipas=="mediana"){
+            cout << left << setw(10) << "Vardas" << setw(10) << "Pavarde" << setw(10) << "Rezultatas (mediana)"<<endl;
+            cout << endl;
+            for(auto i: Grupe) {
+                cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<setw(10) << i.rez_median<< endl;
+            }
         }
-    }
-    else{
-        cout << left << setw(10) << "Vardas" << setw(10) << "Pavarde" << setw(10) << "Rezultatas (vidurkis/mediana)"<<endl;
-        cout << endl;
-        for(auto i: Grupe) {
-            cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<i.rez_avg<<"/"<<i.rez_median<<setw(10)<< endl;
+        else{
+            cout << left << setw(10) << "Vardas" << setw(10) << "Pavarde" << setw(10) << "Rezultatas (vidurkis/mediana)"<<endl;
+            cout << endl;
+            for(auto i: Grupe) {
+                cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<i.rez_avg<<"/"<<i.rez_median<<setw(10)<< endl;
+            }
         }
     }
 }
@@ -201,7 +215,7 @@ Studentas atisitiktiniai_skaiciai(string tipas){
     return Laik; 
 }
 
-void file_nuskaitymas(string path, string rezultato_tipas){
+void file_nuskaitymas(string path, string rezultato_tipas, string kategorija){
     ifstream inFile;
     fstream output_file;
     vector<string> header;
@@ -292,33 +306,56 @@ void file_nuskaitymas(string path, string rezultato_tipas){
     output_file.open("rezultatas.txt", ios::out);
 
     if (output_file.is_open()){
-        if(rezultato_tipas=="vidurkis"){
-            output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Rezultatas (vidurkis)"<<endl;
-            output_file << endl;
+
+        if(kategorija=="T"){
+            output_file << left 
+                        << setw(18) << "Vardas" 
+                        << setw(18) << "Pavarde" 
+                        << setw(18) << "Kategorija" << endl << endl;
 
             for(auto i: students) {
-                output_file << left<< setw(18) << i.vardas << setw(18) << i.pav <<setw(18) << i.rez_avg<< endl;
+                if(studento_kategorija(i.rez_avg)){
+                    output_file << left
+                                << setw(18) << i.vardas 
+                                << setw(18) << i.pav 
+                                << setw(18) << "yay!" << endl;
+                } else {
+                    output_file << left
+                                << setw(18) << i.vardas 
+                                << setw(18) << i.pav 
+                                << setw(18) << "auch..." << endl;
+                }
             }
         }
-        else if(rezultato_tipas=="mediana"){
-            output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Rezultatas (mediana)"<<endl;
-            output_file << endl;
+        else {
+            if(rezultato_tipas=="vidurkis"){
+                output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Rezultatas (vidurkis)"<<endl;
+                output_file << endl;
 
-            for(auto i: students) {
-                output_file << left<< setw(18) << i.vardas << setw(18) << i.pav <<setw(18) << i.rez_median<< endl;
+                for(auto i: students) {
+                    output_file << left<< setw(18) << i.vardas << setw(18) << i.pav <<setw(18) << i.rez_avg<< endl;
+                }
             }
-        }
-        else{
-            output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Rezultatas (vidurkis/mediana)"<<endl;
-            output_file << endl;
-            for(auto i: students) {
-                output_file << left << setw(18) << i.vardas << setw(18) << i.pav << i.rez_avg<<"/"<<i.rez_median<< setw(18) << endl;
+            else if(rezultato_tipas=="mediana"){
+                output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Rezultatas (mediana)"<<endl;
+                output_file << endl;
+
+                for(auto i: students) {
+                    output_file << left<< setw(18) << i.vardas << setw(18) << i.pav <<setw(18) << i.rez_median<< endl;
+                    }
             }
-        }
+            else{
+                output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Rezultatas (vidurkis/mediana)"<<endl;
+                output_file << endl;
+                for(auto i: students) {
+                    output_file << left << setw(18) << i.vardas << setw(18) << i.pav << i.rez_avg<<"/"<<i.rez_median<< setw(18) << endl;
+                    }
+                }
 
         output_file.close();
         cout<<"Rezultatai nuskaityti į rezultatai.txt file'ą!"<< endl;
      }
+    }
 }
 
 void generated_files(int n){
@@ -337,7 +374,7 @@ void generated_files(int n){
 
     nd_kiekis = dist(rd);
 
-    output_file.open("rezultatas_v02.txt", ios::out);
+    output_file.open("duomenys__.txt", ios::out);
         output_file << left << setw(18) << "Vardas" 
                             << setw(18) << "Pavarde";
         for(int j=0; j<nd_kiekis; j++){
@@ -378,4 +415,8 @@ double median_calculation(vector<int> value){
         return value[n/2];
     else
         return (value[n/2 - 1] + value[n/2]) / 2.0;
+}
+
+bool studento_kategorija(double galutinis_balas) {
+    return galutinis_balas >= 5.0;
 }
