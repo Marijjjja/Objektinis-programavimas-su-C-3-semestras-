@@ -1,5 +1,34 @@
 #include "header.h"
 
+int ivadas(){
+    int rezimas;
+
+    cout << " " << endl;
+    cout << " --- STUDENTU REZULTATU SISTEMA --- " << endl;
+    cout << " " << endl;
+
+    cout << "Pasirinkite rezima: " << endl;
+    cout<<"1:   viska suvesti rankiniu budu"<<endl;
+    cout<<"2:   vardas ir pavarde - rankiniu budu; pazymiai - atsitiktiniai"<<endl;
+    cout<<"3:   nuskaityti duomenis is file'o"<< endl;
+    cout<<"- - - --- v.02 versijos dalys --- - - -"<< endl;
+    cout<<"4:   sugeneruoti atsitiktinius duomenis"<< endl;
+    cout<<"5:   file'o rusiavimas i du file'us"<< endl;
+
+    while (true) {
+        if (cin >> rezimas && rezimas >= 1 && rezimas <= 5) {
+            break;
+        }
+        else{ 
+        cout << "Bloga įvestis, iveskite 1, 2, 3, 4, 5: "<< endl;
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+    }
+
+    return rezimas;
+}
+
 void lenteles_atvaizdavimas(string tipas, vector<Studentas> vector){
     if(tipas=="vidurkis"){  
         cout << left << setw(10) << "Vardas" << setw(10) << "Pavarde" << setw(10) << "Rezultatas (vidurkis)"<<endl;
@@ -99,7 +128,7 @@ Studentas atisitiktiniai_skaiciai(string tipas){
     return Laik; 
 }
 
-void file_nuskaitymas(string path, string rezultato_tipas, string kategorija){
+void file_nuskaitymas(string path, string rezultato_tipas, int rezimas){
     ifstream inFile;
     fstream output_file;
     vector<string> header;
@@ -187,32 +216,32 @@ void file_nuskaitymas(string path, string rezultato_tipas, string kategorija){
 
     sorting_values(students);
 
-    output_file.open("rezultatas.txt", ios::out);
-
-    if (output_file.is_open()){
-
-        if(kategorija=="T"){
-            output_file << left 
-                        << setw(18) << "Vardas" 
-                        << setw(18) << "Pavarde" 
-                        << setw(18) << "Kategorija" << endl << endl;
-
-            for(auto i: students) {
-                if(studento_kategorija(i.rez_avg)){
-                    output_file << left
-                                << setw(18) << i.vardas 
-                                << setw(18) << i.pav 
-                                << setw(18) << "yay!" << endl;
-                } else {
-                    output_file << left
-                                << setw(18) << i.vardas 
-                                << setw(18) << i.pav 
-                                << setw(18) << "auch..." << endl;
+    if(rezimas==5){
+        output_file.open("geri_rezultatai.txt", ios::out);
+        output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Pazymys" << setw(18) << "Kategorija" << endl;
+        output_file << endl;
+        for(auto i: students) {
+            if(i.rez_avg>=5.0){
+                output_file << left << setw(18) << i.vardas << setw(18) << i.pav << setw(18) << i.rez_avg << "yay!" << endl;
                 }
             }
+        output_file.close();
+
+        output_file.open("prasti_rezultatai.txt", ios::out);
+        output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Pazymys" << setw(18) << "Kategorija" << endl;
+        output_file << endl;
+        for(auto i: students) {
+            if(i.rez_avg<5.0){
+                output_file << left << setw(18) << i.vardas << setw(18) << i.pav << setw(18) << i.rez_avg << "no..!" << endl;
+                }
+            }
+        output_file.close();
         }
-        else {
-            if(rezultato_tipas=="vidurkis"){
+   
+    else {
+    output_file.open("rezultatas.txt", ios::out);
+    if (output_file.is_open()){
+        if(rezultato_tipas=="vidurkis"){
                 output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Rezultatas (vidurkis)"<<endl;
                 output_file << endl;
 
@@ -220,12 +249,12 @@ void file_nuskaitymas(string path, string rezultato_tipas, string kategorija){
                     output_file << left<< setw(18) << i.vardas << setw(18) << i.pav <<setw(18) << i.rez_avg<< endl;
                 }
             }
-            else if(rezultato_tipas=="mediana"){
-                output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Rezultatas (mediana)"<<endl;
-                output_file << endl;
+        else if(rezultato_tipas=="mediana"){
+            output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Rezultatas (mediana)"<<endl;
+            output_file << endl;
 
-                for(auto i: students) {
-                    output_file << left<< setw(18) << i.vardas << setw(18) << i.pav <<setw(18) << i.rez_median<< endl;
+            for(auto i: students) {
+                output_file << left<< setw(18) << i.vardas << setw(18) << i.pav <<setw(18) << i.rez_median<< endl;
                     }
             }
             else{
@@ -234,13 +263,13 @@ void file_nuskaitymas(string path, string rezultato_tipas, string kategorija){
                 for(auto i: students) {
                     output_file << left << setw(18) << i.vardas << setw(18) << i.pav << i.rez_avg<<"/"<<i.rez_median<< setw(18) << endl;
                     }
-                }
 
         output_file.close();
         cout<<"Rezultatai nuskaityti į rezultatai.txt file'ą!"<< endl;
-     }
+                }
+            }
+        }
     }
-}
 
 void generated_files(int n){
     ifstream inFile;
