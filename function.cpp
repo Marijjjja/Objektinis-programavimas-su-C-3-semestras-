@@ -140,7 +140,6 @@ void file_nuskaitymas(string path, string rezultato_tipas, int rezimas){
     vector<int> homeworkIdx;
     long lineNum = 0;
     
-
     //file'o nuskaitymas
     inFile.open(path);
     if (!inFile) {
@@ -286,6 +285,7 @@ void generated_files(int n){
     uniform_int_distribution<> dist_0(1, 20);
 
     nd_kiekis = dist(rd);
+    auto start = std::chrono::high_resolution_clock::now(); // Paleisti
 
     output_file.open("duomenys__.txt", ios::out);
         output_file << left << setw(18) << "Vardas" 
@@ -310,6 +310,9 @@ void generated_files(int n){
 
         }
         output_file.close();
+        auto end = std::chrono::high_resolution_clock::now(); // Stabdyti
+        std::chrono::duration<double> diff = end-start; // Skirtumas (s)
+        std::cout << "Užtruko: "<< diff.count() << " s\n";
     }
 
 
