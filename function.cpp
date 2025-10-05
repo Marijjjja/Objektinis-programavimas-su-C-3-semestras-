@@ -136,10 +136,13 @@ void file_nuskaitymas(string path, string rezultato_tipas, int rezimas){
     string line;
     string token;
     vector<Studentas> students;
+    Kategorizacija sukagorizuoti_studentai;
     int nameIdx=-1, surnameIdx=-1, examIdx=-1;
     vector<int> homeworkIdx;
     long lineNum = 0;
     
+    auto start = std::chrono::high_resolution_clock::now(); // Paleisti
+
     //file'o nuskaitymas
     inFile.open(path);
     if (!inFile) {
@@ -213,28 +216,43 @@ void file_nuskaitymas(string path, string rezultato_tipas, int rezimas){
     }
     inFile.close();
 
+    auto end = std::chrono::high_resolution_clock::now(); // Stabdyti
+    std::chrono::duration<double> diff = end-start; // Skirtumas (s)
+    std::cout << "Užtruko: "<< diff.count() << " s\n";
+
     sorting_values(students);
 
+    auto start0 = std::chrono::high_resolution_clock::now(); // Paleisti
+    sukagorizuoti_studentai = studento_kategorizacija(students);
+    auto end0 = std::chrono::high_resolution_clock::now(); // Stabdyti
+    std::chrono::duration<double> diff0 = end0-start0; // Skirtumas (s)
+    std::cout << "Užtruko: "<< diff0.count() << " s\n";
+
     if(rezimas==5){
+        auto start1 = std::chrono::high_resolution_clock::now(); // Paleisti
+        
         output_file.open("geri_rezultatai.txt", ios::out);
         output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Pazymys" << setw(18) << "Kategorija" << endl;
         output_file << endl;
-        for(auto i: students) {
-            if(i.rez_avg>=5.0){
-                output_file << left << setw(18) << i.vardas << setw(18) << i.pav << setw(18) << i.rez_avg << "yay!" << endl;
-                }
+        for(auto i: sukagorizuoti_studentai.islaike) {
+            output_file << left << setw(18) << i.vardas << setw(18) << i.pav << setw(18) << i.rez_avg << "yay!" << endl;
             }
+
         output_file.close();
 
         output_file.open("prasti_rezultatai.txt", ios::out);
         output_file << left << setw(18) << "Vardas" << setw(18) << "Pavarde" << setw(18) << "Pazymys" << setw(18) << "Kategorija" << endl;
         output_file << endl;
-        for(auto i: students) {
-            if(i.rez_avg<5.0){
-                output_file << left << setw(18) << i.vardas << setw(18) << i.pav << setw(18) << i.rez_avg << "no..!" << endl;
-                }
+        for(auto i: sukagorizuoti_studentai.neislaike) {
+            output_file << left << setw(18) << i.vardas << setw(18) << i.pav << setw(18) << i.rez_avg << "no..!" << endl;
             }
         output_file.close();
+
+        auto end1 = std::chrono::high_resolution_clock::now(); // Stabdyti
+        std::chrono::duration<double> diff1 = end1-start1; // Skirtumas (s)
+        std::cout << "Užtruko: "<< diff1.count() << " s\n";
+
+
         }
    
     else {
@@ -285,7 +303,6 @@ void generated_files(int n){
     uniform_int_distribution<> dist_0(1, 20);
 
     nd_kiekis = dist(rd);
-    auto start = std::chrono::high_resolution_clock::now(); // Paleisti
 
     output_file.open("duomenys__.txt", ios::out);
         output_file << left << setw(18) << "Vardas" 
@@ -310,9 +327,6 @@ void generated_files(int n){
 
         }
         output_file.close();
-        auto end = std::chrono::high_resolution_clock::now(); // Stabdyti
-        std::chrono::duration<double> diff = end-start; // Skirtumas (s)
-        std::cout << "Užtruko: "<< diff.count() << " s\n";
     }
 
 
@@ -333,6 +347,15 @@ double median_calculation(vector<int> value){
         return (value[n/2 - 1] + value[n/2]) / 2.0;
 }
 
-bool studento_kategorija(double galutinis_balas) {
-    return galutinis_balas >= 5.0;
+Kategorizacija studento_kategorizacija(vector<Studentas> vektorius) {
+    Kategorizacija rez;
+    for(auto &i: vektorius){
+        if(i.rez_avg>=5.0){
+            rez.islaike.push_back(i);
+        }
+        else {
+            rez.neislaike.push_back(i);
+        }
+    }
+    return rez;
 }

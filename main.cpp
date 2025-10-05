@@ -43,8 +43,8 @@ int main(){
         cout << "Kiek studentu noresite ivesti? "<< endl;
         cin >> studentu_kiekis; 
     } 
-    else {
-        cout << "Pateikite filo, kuri norite nuskaityti path."<< endl;
+    else if(rezimas == 3 || rezimas == 5){
+        cout << "Pateikite file'o path: ";
         cin >> path;
     }
 
