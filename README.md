@@ -1,0 +1,13 @@
+# Spartos analizė
+
+## Sugeneruojami atsitiktiniai file'ai
+- Atsitiktinis kiekis namų darbų (gali būti nuo 1 iki 20 namų darbų);
+- Vardai ir pavardės šabloninės;
+
+| Eilučių kiekis | Bandymas 1 (s) | Bandymas 2 (s) | Bandymas 3 (s) | Vidurkis (s) |
+|----------------|----------------|----------------|----------------|--------------|
+| 1,000          | 0.0109772 (7 ND)| 0.007392 (1 ND)| 0.0169882 (8 ND)| **0.0114**|
+| 10,000         | 0.0494063 (3 ND)| 0.0635949 (10 ND)| 0.0619037 (10 ND)| **0.0574**|
+| 100,000        | 0.31102 (2 ND)| 0.397292 (5 ND)| 0.0593274 (6 ND)| **0.25577**|
+| 1,000,000      | 2.44655 (1 ND)| 2.92129 (5 ND)| 2.64988 (4 ND)| **2.688**|
+| 10,000,000     | 33.0758 (8 ND)| 21.1361 (1 ND)| 24.8245 (3 ND)| **26.343**|
