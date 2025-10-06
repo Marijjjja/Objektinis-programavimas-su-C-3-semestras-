@@ -44,7 +44,7 @@ int main(){
         cin >> studentu_kiekis; 
     } 
     else if(rezimas == 3 || rezimas == 5){
-        cout << "Pateikite file'o path: ";
+        cout << "Pateikite file'o path: "<< endl;
         cin >> path;
     }
 
@@ -63,23 +63,8 @@ int main(){
         file_nuskaitymas(path, rezultato_tipas, rezimas);
         return 0;
         }
-
+    
+    sorting_values(Grupe);
     lenteles_atvaizdavimas(rezultato_tipas, Grupe);
 
-    // sorting_values(Grupe);
-
-    // if(atsakymas=="T"){
-    //     cout << left << setw(10) << "Vardas" << setw(10) << "Pavarde" << setw(10) << "Kategorija"<<endl;
-    //     cout << endl;
-    //     for(auto i: Grupe) {
-    //         if(studento_kategorija(i.rez_avg)){
-    //             cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<setw(10) << "yay!" << endl;
-    //         } else {
-    //             cout << left<< setw(10) << i.vardas << setw(10) << i.pav <<setw(10) << "auch..." << endl;
-    //         }
-    //     }
-    // } 
-    // else {
-    //     lenteles_atvaizdavimas(rezultato_tipas, Grupe);
-    //     }
 }
