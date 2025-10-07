@@ -166,8 +166,7 @@ void file_nuskaitymas(string path, string rezultato_tipas, int rezimas){
         else if (col.find("ND") != string::npos) homeworkIdx.push_back(i);
         else if (col.find("Egz") != string::npos) examIdx = i;
     }
-    cout << "header indices: nameIdx=" << nameIdx << ", surnameIdx=" << surnameIdx << endl;
-
+    
     //duomenu nuskanavimas is txt file'o ir pridejimas prie vektoriaus
     while (getline(inFile, line)) {
         stringstream ss(line);
